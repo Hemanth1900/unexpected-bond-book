@@ -3,57 +3,44 @@ body{
     font-family:'Libre Baskerville', serif;
 }
 
-/* LANDING PAGE */
+/* ================= LANDING PAGE ================= */
+
+/* PURE COVER LANDING */
 .landing{
     height:100vh;
     background:url('cover.jpg') center/cover no-repeat;
-    position:relative;
     display:flex;
     justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:white;
+    align-items:flex-end;
+    padding-bottom:80px;
 }
 
-.overlay{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.45);
-}
-
-.landing-content{
-    position:relative;
-    z-index:2;
-    max-width:600px;
-}
-
-.landing h1{
-    font-family:'Playfair Display', serif;
-    font-size:46px;
-    margin-bottom:20px;
-}
-
-.hook{
-    font-size:18px;
-    opacity:0.9;
-    margin-bottom:20px;
-}
-
-.author{
-    margin-bottom:30px;
-    font-size:16px;
-}
-
+/* Cinematic fade-in button */
 .read-btn{
-    padding:14px 32px;
     background:white;
     color:black;
+    padding:14px 34px;
     text-decoration:none;
     font-weight:600;
     border-radius:4px;
+    font-size:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+
+    opacity:0;
+    transform:translateY(20px);
+    animation:fadeButton 1.5s ease forwards;
+    animation-delay:1.5s;
 }
 
-/* ROTATE SCREEN */
+@keyframes fadeButton{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* ================= ROTATE SCREEN ================= */
+
 #rotate-msg{
     position:fixed;
     inset:0;
@@ -62,9 +49,12 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    text-align:center;
+    font-size:22px;
+    z-index:2000;
 }
 
-/* LANDSCAPE BOOK */
+/* LANDSCAPE BOOK ONLY */
 @media screen and (orientation:portrait){
     .wood-bg{ display:none; }
 }
@@ -72,7 +62,8 @@ body{
     #rotate-msg{ display:none; }
 }
 
-/* WOOD */
+/* ================= WOOD TABLE ================= */
+
 .wood-bg{
     height:100vh;
     background:linear-gradient(#8b5e3c,#6e452b);
@@ -80,6 +71,8 @@ body{
     justify-content:center;
     align-items:center;
 }
+
+/* ================= BOOK BODY ================= */
 
 .book-frame{
     width:1100px;
@@ -91,7 +84,8 @@ body{
     position:relative;
 }
 
-/* PAGE */
+/* ================= PAGES ================= */
+
 .page{
     background:#f6f1e7;
     padding:70px;
@@ -101,25 +95,114 @@ body{
     justify-content:center;
 }
 
+/* TEXT COLUMN */
 .page-content{
     width:80%;
     max-width:420px;
 }
 
+/* PARAGRAPH */
 .page-content p{
     line-height:1.9;
     font-size:17px;
     text-align:justify;
 }
 
-.chapter-number{ font-size:28px; }
-.chapter-title{ font-size:34px; margin-bottom:40px; }
+/* DROP CAP */
+.page-content p:first-of-type::first-letter{
+    font-size:64px;
+    float:left;
+    margin-right:10px;
+    font-family:'Playfair Display', serif;
+}
 
-.header-left{ position:absolute; top:20px; left:40px; font-size:13px; }
-.header-right{ position:absolute; top:20px; right:40px; font-size:13px; }
+/* ================= CHAPTER HEADINGS ================= */
 
-.page-number-left{ position:absolute; bottom:25px; left:40px; }
-.page-number-right{ position:absolute; bottom:25px; right:40px; }
+.chapter-number{
+    font-size:28px;
+    font-weight:600;
+    margin-bottom:6px;
+}
+
+.chapter-title{
+    font-size:34px;
+    font-weight:700;
+    margin-bottom:40px;
+}
+
+/* ================= RUNNING HEADERS ================= */
+
+.header-left{
+    position:absolute;
+    top:20px;
+    left:40px;
+    font-size:13px;
+    opacity:0.7;
+}
+
+.header-right{
+    position:absolute;
+    top:20px;
+    right:40px;
+    font-size:13px;
+    opacity:0.7;
+}
+
+/* ================= PAGE NUMBERS ================= */
+
+.page-number-left{
+    position:absolute;
+    bottom:25px;
+    left:40px;
+    font-size:13px;
+    opacity:0.7;
+}
+
+.page-number-right{
+    position:absolute;
+    bottom:25px;
+    right:40px;
+    font-size:13px;
+    opacity:0.7;
+}
+
+/* ================= COVER PAGE INSIDE BOOK ================= */
+
+.cover{
+    background:url('cover.jpg') center/cover no-repeat;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    color:white;
+    position:relative;
+}
+
+.cover::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.35);
+}
+
+.cover-content{
+    position:relative;
+    z-index:2;
+    margin-bottom:80px;
+    text-align:center;
+}
+
+.cover-title{
+    font-family:'Playfair Display', serif;
+    font-size:42px;
+    font-weight:600;
+}
+
+.cover-author{
+    margin-top:15px;
+    font-size:16px;
+}
+
+/* ================= BOOKMARK ================= */
 
 .bookmark{
     position:absolute;
@@ -129,4 +212,6 @@ body{
     color:white;
     padding:10px 15px;
     cursor:pointer;
+    border-radius:4px;
+    font-size:13px;
 }
