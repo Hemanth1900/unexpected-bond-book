@@ -4,36 +4,27 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width,
-initial-scale=1.0,
-maximum-scale=5.0,
-minimum-scale=0.5,
-user-scalable=yes">
+content="width=device-width, initial-scale=1,
+maximum-scale=5, minimum-scale=0.5, user-scalable=yes">
 
 <title>Unexpected Bond, Unexpected Goodbye</title>
 
 <link rel="stylesheet" href="style.css">
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Libre+Baskerville&display=swap" rel="stylesheet">
-
-<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
 </head>
 
 <body>
 
-<div id="rotate-msg">
-    Rotate your device to landscape to read the book
-</div>
+<div id="reader">
 
-<div class="wood-bg">
+    <!-- COVER PAGE -->
+    <section class="page cover">
+        <img src="cover.jpg" alt="Book cover">
+    </section>
 
-    <div class="book-frame">
-
-        <div class="bookmark" onclick="saveBookmark()">Bookmark</div>
-
-        <div id="book"></div>
-
-    </div>
+    <!-- CHAPTERS LOAD HERE -->
+    <div id="chapters"></div>
 
 </div>
 
