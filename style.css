@@ -123,3 +123,24 @@ body{
     font-size:13px;
     z-index:999;
 }
+html, body {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* Force landscape reading area */
+.wood-bg{
+    width:1300px;
+    height:100vh;
+}
+
+/* Lock book horizontal */
+.book-frame{
+    width:1100px;
+    height:700px;
+}
+
+/* prevent vertical scroll inside pages */
+.page{
+    overflow:hidden;
+}
