@@ -1,51 +1,68 @@
 const bookElement = document.getElementById("book");
 
-async function loadChapters() {
+/* ADD COVER PAGE FIRST */
+function addCover(){
+
+    const cover = document.createElement("div");
+    cover.className = "page cover";
+
+    cover.innerHTML = `
+        <div class="cover-content">
+            <div class="cover-title">Unexpected Bond,<br>Unexpected Goodbye</div>
+            <div class="cover-author">Ayush A.</div>
+        </div>
+    `;
+
+    bookElement.appendChild(cover);
+}
+
+/* LOAD CHAPTER FILES */
+async function loadChapters(){
+
+    addCover();
 
     let chapterNumber = 1;
     let pageCount = 1;
 
-    while (true) {
-        try {
-            const response = await fetch(`chapter${chapterNumber}.txt`);
-            if (!response.ok) break;
+    while(true){
+        try{
+            const res = await fetch(`chapter${chapterNumber}.txt`);
+            if(!res.ok) break;
 
-            const text = await response.text();
+            const text = await res.text();
             const lines = text.split("\n");
 
-            const chapterHeading = `
-                <div class="chapter-number">${lines[0]}</div>
-                <div class="chapter-title">${lines[1]}</div>
-            `;
+            const chapterNum = lines[0];
+            const chapterTitle = lines[1];
 
             const contentText = lines.slice(2).join("\n\n");
 
-            /* SPLIT TEXT INTO REAL BOOK PAGES */
             const words = contentText.split(" ");
             let pageText = "";
-            let wordLimit = 110;
             let counter = 0;
+            let firstPage = true;
 
-            for (let word of words) {
+            for(let word of words){
                 pageText += word + " ";
                 counter++;
 
-                if (counter >= wordLimit) {
-                    createPage(pageText, chapterHeading, pageCount);
+                if(counter >= 110){
+                    createPage(pageText, chapterNum, chapterTitle, pageCount, firstPage);
                     pageText = "";
                     counter = 0;
                     pageCount++;
+                    firstPage = false;
                 }
             }
 
-            if (pageText.trim() !== "") {
-                createPage(pageText, chapterHeading, pageCount);
+            if(pageText.trim() !== ""){
+                createPage(pageText, chapterNum, chapterTitle, pageCount, firstPage);
                 pageCount++;
             }
 
             chapterNumber++;
 
-        } catch {
+        }catch{
             break;
         }
     }
@@ -54,61 +71,66 @@ async function loadChapters() {
 }
 
 /* CREATE EACH PAGE */
-function createPage(text, heading, pageNumber) {
+function createPage(text, chapterNum, chapterTitle, pageNumber, firstPage){
 
     const page = document.createElement("div");
     page.className = "page";
 
-    let html = "";
+    let html = `<div class="page-content">`;
 
-    /* Heading only on right page */
-    if (pageNumber % 2 !== 0) {
-        html += heading;
+    /* FIRST PAGE OF CHAPTER */
+    if(firstPage){
+        html += `<div class="chapter-number">${chapterNum}</div>`;
+        html += `<div class="chapter-title">${chapterTitle}</div>`;
+    }
+    else{
+        /* RUNNING HEADERS */
+        if(pageNumber % 2 === 0){
+            html += `<div class="header-right">${chapterTitle}</div>`;
+        } else {
+            html += `<div class="header-left">Ayush A.</div>`;
+        }
     }
 
     html += `<p>${text}</p>`;
+    html += `</div>`;
 
-    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right' : 'page-number-left'}">${pageNumber}</div>`;
+    /* PAGE NUMBER */
+    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right':'page-number-left'}">${pageNumber}</div>`;
 
     page.innerHTML = html;
     bookElement.appendChild(page);
 }
 
-/* REAL BOOK ENGINE */
-function initBook() {
+/* PAGE FLIP ENGINE */
+function initBook(){
 
-    const pageFlip = new St.PageFlip(bookElement, {
-        width: 520,
-        height: 680,
-        minWidth: 520,
-        maxWidth: 1200,
-        minHeight: 680,
-        maxHeight: 1400,
-
-        size: "fixed",
-        showCover: false,
-        useMouseEvents: true,
-        mobileScrollSupport: false,
-
-        usePortrait: false,        // ALWAYS SPREAD MODE
-        startZIndex: 0,
-        autoSize: false,
-        maxShadowOpacity: 0.6,
-        showPageCorners: true
+    const pageFlip = new St.PageFlip(bookElement,{
+        width:520,
+        height:680,
+        size:"fixed",
+        showCover:true,
+        useMouseEvents:true,
+        mobileScrollSupport:false,
+        usePortrait:false,
+        autoSize:false,
+        maxShadowOpacity:0.7,
+        showPageCorners:true
     });
 
     pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
-    /* Bookmark */
-    window.saveBookmark = function () {
+    /* BOOKMARK SYSTEM */
+    window.saveBookmark = function(){
         localStorage.setItem("bookmark", pageFlip.getCurrentPageIndex());
         alert("Page bookmarked!");
     };
 
-    const savedPage = localStorage.getItem("bookmark");
-    if (savedPage) {
-        pageFlip.flip(savedPage);
+    const saved = localStorage.getItem("bookmark");
+    if(saved){
+        pageFlip.flip(saved);
     }
 }
 
+/* START */
 loadChapters();
