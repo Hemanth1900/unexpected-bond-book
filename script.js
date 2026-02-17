@@ -5,13 +5,12 @@ async function loadChapters() {
     let chapterNumber = 1;
     let pageCount = 1;
 
-    while(true){
-        try{
+    while (true) {
+        try {
             const response = await fetch(`chapter${chapterNumber}.txt`);
-            if(!response.ok) break;
+            if (!response.ok) break;
 
             const text = await response.text();
-
             const lines = text.split("\n");
 
             const chapterHeading = `
@@ -21,36 +20,32 @@ async function loadChapters() {
 
             const contentText = lines.slice(2).join("\n\n");
 
-            /* SPLIT TEXT INTO BOOK PAGES */
+            /* SPLIT TEXT INTO REAL BOOK PAGES */
             const words = contentText.split(" ");
             let pageText = "";
-            let pageWordLimit = 120; // controls how much text per page
-            let wordCounter = 0;
+            let wordLimit = 110;
+            let counter = 0;
 
-            for(let word of words){
-
+            for (let word of words) {
                 pageText += word + " ";
-                wordCounter++;
+                counter++;
 
-                if(wordCounter >= pageWordLimit){
-
+                if (counter >= wordLimit) {
                     createPage(pageText, chapterHeading, pageCount);
-
                     pageText = "";
-                    wordCounter = 0;
+                    counter = 0;
                     pageCount++;
                 }
             }
 
-            /* Remaining words */
-            if(pageText.trim() !== ""){
+            if (pageText.trim() !== "") {
                 createPage(pageText, chapterHeading, pageCount);
                 pageCount++;
             }
 
             chapterNumber++;
 
-        }catch{
+        } catch {
             break;
         }
     }
@@ -58,52 +53,60 @@ async function loadChapters() {
     initBook();
 }
 
-/* CREATE EACH BOOK PAGE */
-function createPage(text, heading, pageNumber){
+/* CREATE EACH PAGE */
+function createPage(text, heading, pageNumber) {
 
     const page = document.createElement("div");
     page.className = "page";
 
     let html = "";
 
-    if(pageNumber % 2 !== 0){
+    /* Heading only on right page */
+    if (pageNumber % 2 !== 0) {
         html += heading;
     }
 
     html += `<p>${text}</p>`;
 
-    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right':'page-number-left'}">${pageNumber}</div>`;
+    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right' : 'page-number-left'}">${pageNumber}</div>`;
 
     page.innerHTML = html;
-
     bookElement.appendChild(page);
 }
 
-/* INIT PAGE FLIP */
-function initBook(){
+/* REAL BOOK ENGINE */
+function initBook() {
 
-    const pageFlip = new St.PageFlip(
-        bookElement,
-        {
-            width: 500,
-            height: 650,
-            size: "stretch",
-            showCover: false,
-            mobileScrollSupport: true,
-            useMouseEvents: true
-        }
-    );
+    const pageFlip = new St.PageFlip(bookElement, {
+        width: 520,
+        height: 680,
+        minWidth: 520,
+        maxWidth: 1200,
+        minHeight: 680,
+        maxHeight: 1400,
+
+        size: "fixed",
+        showCover: false,
+        useMouseEvents: true,
+        mobileScrollSupport: false,
+
+        usePortrait: false,        // ALWAYS SPREAD MODE
+        startZIndex: 0,
+        autoSize: false,
+        maxShadowOpacity: 0.6,
+        showPageCorners: true
+    });
 
     pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
     /* Bookmark */
-    window.saveBookmark = function(){
+    window.saveBookmark = function () {
         localStorage.setItem("bookmark", pageFlip.getCurrentPageIndex());
         alert("Page bookmarked!");
-    }
+    };
 
     const savedPage = localStorage.getItem("bookmark");
-    if(savedPage){
+    if (savedPage) {
         pageFlip.flip(savedPage);
     }
 }
