@@ -1,0 +1,47 @@
+body{
+    margin:0;
+    background:#e6dccb;
+    font-family:'Libre Baskerville', serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+#book{
+    width:900px;
+    height:600px;
+}
+
+.page{
+    background:#fdfaf4;
+    padding:40px;
+    box-sizing:border-box;
+}
+
+h1,h2{
+    font-family:'Playfair Display', serif;
+}
+
+p{
+    line-height:1.8;
+    font-size:15px;
+}
+
+.cover{
+    background:#efe6d6;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.bookmark{
+    position:fixed;
+    top:10px;
+    right:20px;
+    background:#2e2a24;
+    color:white;
+    padding:10px;
+    cursor:pointer;
+}
