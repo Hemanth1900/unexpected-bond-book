@@ -1,8 +1,18 @@
 const bookElement = document.getElementById("book");
 
-/* ADD COVER PAGE FIRST */
+/* ============================= */
+/* ADD REAL BOOK OPENING PAGES   */
+/* ============================= */
+
 function addCover(){
 
+    /* LEFT INSIDE BLANK */
+    const insideBlank = document.createElement("div");
+    insideBlank.className = "page";
+    insideBlank.innerHTML = `<div class="page-content"></div>`;
+    bookElement.appendChild(insideBlank);
+
+    /* RIGHT PAGE = COVER */
     const cover = document.createElement("div");
     cover.className = "page cover";
 
@@ -12,11 +22,19 @@ function addCover(){
             <div class="cover-author">Ayush A.</div>
         </div>
     `;
-
     bookElement.appendChild(cover);
+
+    /* BLANK PAGE AFTER COVER */
+    const blankAfter = document.createElement("div");
+    blankAfter.className = "page";
+    blankAfter.innerHTML = `<div class="page-content"></div>`;
+    bookElement.appendChild(blankAfter);
 }
 
-/* LOAD CHAPTER FILES */
+/* ============================= */
+/* LOAD CHAPTER FILES            */
+/* ============================= */
+
 async function loadChapters(){
 
     addCover();
@@ -35,9 +53,9 @@ async function loadChapters(){
             const chapterNum = lines[0];
             const chapterTitle = lines[1];
 
-            const contentText = lines.slice(2).join("\n\n");
+            const content = lines.slice(2).join("\n\n");
 
-            const words = contentText.split(" ");
+            const words = content.split(" ");
             let pageText = "";
             let counter = 0;
             let firstPage = true;
@@ -46,7 +64,7 @@ async function loadChapters(){
                 pageText += word + " ";
                 counter++;
 
-                if(counter >= 110){
+                if(counter >= 120){
                     createPage(pageText, chapterNum, chapterTitle, pageCount, firstPage);
                     pageText = "";
                     counter = 0;
@@ -70,7 +88,10 @@ async function loadChapters(){
     initBook();
 }
 
-/* CREATE EACH PAGE */
+/* ============================= */
+/* CREATE BOOK PAGES             */
+/* ============================= */
+
 function createPage(text, chapterNum, chapterTitle, pageNumber, firstPage){
 
     const page = document.createElement("div");
@@ -95,27 +116,33 @@ function createPage(text, chapterNum, chapterTitle, pageNumber, firstPage){
     html += `<p>${text}</p>`;
     html += `</div>`;
 
-    /* PAGE NUMBER */
-    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right':'page-number-left'}">${pageNumber}</div>`;
+    /* PAGE NUMBERS */
+    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right' : 'page-number-left'}">${pageNumber}</div>`;
 
     page.innerHTML = html;
     bookElement.appendChild(page);
 }
 
-/* PAGE FLIP ENGINE */
+/* ============================= */
+/* PAGE FLIP ENGINE (OPTIMIZED)  */
+/* ============================= */
+
 function initBook(){
 
     const pageFlip = new St.PageFlip(bookElement,{
-        width:520,
-        height:680,
+        width:500,
+        height:660,
         size:"fixed",
         showCover:true,
+
+        /* PERFORMANCE OPTIMIZATION */
         useMouseEvents:true,
         mobileScrollSupport:false,
         usePortrait:false,
         autoSize:false,
-        maxShadowOpacity:0.7,
-        showPageCorners:true
+        maxShadowOpacity:0.3,
+        showPageCorners:false,
+        flippingTime:600
     });
 
     pageFlip.loadFromHTML(document.querySelectorAll(".page"));
@@ -132,5 +159,8 @@ function initBook(){
     }
 }
 
-/* START */
+/* ============================= */
+/* START BOOK                    */
+/* ============================= */
+
 loadChapters();
