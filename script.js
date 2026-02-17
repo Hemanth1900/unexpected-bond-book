@@ -12,31 +12,43 @@ async function loadChapters() {
 
             const text = await response.text();
 
-            const page = document.createElement("div");
-            page.className = "page";
-
             const lines = text.split("\n");
 
-            let html = "";
+            const chapterHeading = `
+                <div class="chapter-number">${lines[0]}</div>
+                <div class="chapter-title">${lines[1]}</div>
+            `;
 
-            html += `<div class="chapter-number">${lines[0]}</div>`;
-            html += `<div class="chapter-title">${lines[1]}</div>`;
+            const contentText = lines.slice(2).join("\n\n");
 
-            const content = lines.slice(2).join("\n\n");
+            /* SPLIT TEXT INTO BOOK PAGES */
+            const words = contentText.split(" ");
+            let pageText = "";
+            let pageWordLimit = 120; // controls how much text per page
+            let wordCounter = 0;
 
-            html += content
-                .split("\n\n")
-                .map(p => `<p>${p}</p>`)
-                .join("");
+            for(let word of words){
 
-            html += `<div class="${pageCount % 2 === 0 ? 'page-number-right':'page-number-left'}">${pageCount}</div>`;
+                pageText += word + " ";
+                wordCounter++;
 
-            page.innerHTML = html;
+                if(wordCounter >= pageWordLimit){
 
-            bookElement.appendChild(page);
+                    createPage(pageText, chapterHeading, pageCount);
+
+                    pageText = "";
+                    wordCounter = 0;
+                    pageCount++;
+                }
+            }
+
+            /* Remaining words */
+            if(pageText.trim() !== ""){
+                createPage(pageText, chapterHeading, pageCount);
+                pageCount++;
+            }
 
             chapterNumber++;
-            pageCount++;
 
         }catch{
             break;
@@ -46,6 +58,28 @@ async function loadChapters() {
     initBook();
 }
 
+/* CREATE EACH BOOK PAGE */
+function createPage(text, heading, pageNumber){
+
+    const page = document.createElement("div");
+    page.className = "page";
+
+    let html = "";
+
+    if(pageNumber % 2 !== 0){
+        html += heading;
+    }
+
+    html += `<p>${text}</p>`;
+
+    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right':'page-number-left'}">${pageNumber}</div>`;
+
+    page.innerHTML = html;
+
+    bookElement.appendChild(page);
+}
+
+/* INIT PAGE FLIP */
 function initBook(){
 
     const pageFlip = new St.PageFlip(
@@ -62,6 +96,7 @@ function initBook(){
 
     pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 
+    /* Bookmark */
     window.saveBookmark = function(){
         localStorage.setItem("bookmark", pageFlip.getCurrentPageIndex());
         alert("Page bookmarked!");
