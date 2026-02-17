@@ -1,220 +1,70 @@
-/* ================= GLOBAL ================= */
-
-html,body{
+html, body{
     margin:0;
+    padding:0;
     font-family:'Libre Baskerville', serif;
-    touch-action:pan-x pan-y pinch-zoom;
-}
-
-/* ================= LANDING PAGE ================= */
-
-.landing{
-    height:100vh;
-    background:url('cover.jpg') center/cover no-repeat;
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
-    padding-bottom:80px;
-}
-
-.read-btn{
-    background:white;
-    color:black;
-    padding:14px 34px;
-    text-decoration:none;
-    font-weight:600;
-    border-radius:4px;
-    font-size:15px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.25);
-
-    opacity:0;
-    transform:translateY(20px);
-    animation:fadeButton 1.5s ease forwards;
-    animation-delay:1.5s;
-}
-
-@keyframes fadeButton{
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-/* ================= ROTATE SCREEN ================= */
-
-#rotate-msg{
-    position:fixed;
-    inset:0;
-    background:#8b5e3c;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    font-size:22px;
-    z-index:2000;
-}
-
-@media screen and (orientation:portrait){
-    .wood-bg{ display:none; }
-}
-@media screen and (orientation:landscape){
-    #rotate-msg{ display:none; }
-}
-
-/* ================= WOOD TABLE ================= */
-
-.wood-bg{
-    height:100vh;
-    background:linear-gradient(#8b5e3c,#6e452b);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-/* ================= BOOK FRAME ================= */
-
-.book-frame{
-    width:1100px;
-    height:700px;
-    background:#6b4328;
-    padding:25px;
-    border-radius:10px;
-    box-shadow:0 35px 80px rgba(0,0,0,0.5);
-    position:relative;
-}
-
-/* ================= PAGE ================= */
-
-.page{
     background:#f6f1e7;
-    padding:70px;
-    padding-bottom:120px;
-    position:relative;
+}
+
+/* SCROLL SNAP BOOK */
+#reader{
+    scroll-snap-type:y mandatory;
+    overflow-y:scroll;
+    height:100vh;
+}
+
+/* EACH PAGE */
+.page{
+    min-height:100vh;
+    scroll-snap-align:start;
     display:flex;
     justify-content:center;
+    align-items:center;
+    padding:60px 20px;
+    box-sizing:border-box;
 }
 
-/* TEXT COLUMN CENTERED */
+/* COVER */
+.cover img{
+    width:100%;
+    max-width:520px;
+    height:auto;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+}
+
+/* TEXT PAGE */
 .page-content{
-    width:80%;
-    max-width:420px;
+    width:100%;
+    max-width:520px;
 }
 
-/* PARAGRAPH STYLE */
-.page-content p{
-    line-height:1.9;
-    font-size:17px;
-    text-align:justify;
-}
-
-/* ================= DROP CAP ================= */
-
-.page-content p:first-of-type::first-letter{
-    font-size:78px;
-    line-height:0.85;
-    float:left;
-    margin-right:12px;
-    margin-top:-6px;
-    font-family:'Playfair Display', serif;
-}
-
-/* ================= CHAPTER TYPOGRAPHY ================= */
-
+/* CHAPTER NUMBER */
 .chapter-number{
-    font-size:28px;
-    font-weight:600;
-    margin-bottom:6px;
+    font-family:'Playfair Display', serif;
+    font-size:20px;
+    margin-bottom:5px;
 }
 
+/* CHAPTER TITLE */
 .chapter-title{
-    font-size:34px;
-    font-weight:700;
+    font-family:'Playfair Display', serif;
+    font-size:32px;
+    font-style:italic;
     margin-bottom:40px;
 }
 
-/* ================= RUNNING HEADERS ================= */
-
-.header-left{
-    position:absolute;
-    top:20px;
-    left:40px;
-    font-size:13px;
-    opacity:0.7;
+/* PARAGRAPH TEXT */
+.page-content p{
+    font-size:18px;
+    line-height:2;
+    text-align:justify;
+    color:#2b2b2b;
 }
 
-.header-right{
-    position:absolute;
-    top:20px;
-    right:40px;
-    font-size:13px;
-    opacity:0.7;
-}
-
-/* ================= PAGE NUMBERS ================= */
-
-.page-number-left{
-    position:absolute;
-    bottom:25px;
-    left:40px;
-    font-size:13px;
-    opacity:0.7;
-}
-
-.page-number-right{
-    position:absolute;
-    bottom:25px;
-    right:40px;
-    font-size:13px;
-    opacity:0.7;
-}
-
-/* ================= COVER PAGE INSIDE BOOK ================= */
-
-.cover{
-    background:url('cover.jpg') center/cover no-repeat;
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-    color:white;
-    position:relative;
-}
-
-.cover::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.35);
-}
-
-.cover-content{
-    position:relative;
-    z-index:2;
-    margin-bottom:80px;
-    text-align:center;
-}
-
-.cover-title{
+/* DROP CAP */
+.page-content p:first-of-type::first-letter{
+    font-size:84px;
+    float:left;
+    margin-right:12px;
+    margin-top:-10px;
     font-family:'Playfair Display', serif;
-    font-size:42px;
-    font-weight:600;
-}
-
-.cover-author{
-    margin-top:15px;
-    font-size:16px;
-}
-
-/* ================= BOOKMARK ================= */
-
-.bookmark{
-    position:absolute;
-    top:-20px;
-    right:20px;
-    background:#2e2a24;
-    color:white;
-    padding:10px 15px;
-    cursor:pointer;
-    border-radius:4px;
-    font-size:13px;
 }
