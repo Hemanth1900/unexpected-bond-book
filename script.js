@@ -1,28 +1,30 @@
 const bookElement = document.getElementById("book");
 
-// PAGEFLIP INITIALIZATION (FAST + SMOOTH)
+/* INITIALIZE PAGEFLIP */
 const pageFlip = new St.PageFlip(bookElement, {
-    width:550,
-    height:700,
+    width:520,
+    height:680,
     size:"stretch",
     maxShadowOpacity:0.25,
     showCover:true,
     mobileScrollSupport:true,
-    swipeDistance:25,
+    swipeDistance:30,
     autoSize:true,
     clickEventForward:true,
     useMouseEvents:true
 });
 
-// LOAD CHAPTER FILES
+/* LOAD CHAPTER FILES */
 async function loadChapters(){
 
-    const chapters = [
+    const chapterFiles = [
         "chapter1.txt",
         "chapter2.txt"
     ];
 
-    for(let file of chapters){
+    let allPages = [];
+
+    for(let file of chapterFiles){
 
         const res = await fetch(file);
         const text = await res.text();
@@ -30,15 +32,19 @@ async function loadChapters(){
         const pages = splitIntoPages(text);
 
         pages.forEach(page=>{
-            pageFlip.loadFromHTML(createPage(page));
+            allPages.push(createPage(page));
         });
     }
+
+    /* LOAD ALL PAGES AT ONCE */
+    pageFlip.loadFromHTML(allPages);
 }
 
-// SPLIT TEXT INTO PAGE BLOCKS
+/* SPLIT TEXT INTO BOOK PAGES */
 function splitIntoPages(text){
+
     const words = text.split(" ");
-    const pages = [];
+    let pages = [];
     let current = "";
 
     words.forEach(word=>{
@@ -53,8 +59,9 @@ function splitIntoPages(text){
     return pages;
 }
 
-// CREATE PAGE HTML
+/* CREATE PAGE HTML */
 function createPage(content){
+
     const page = document.createElement("div");
     page.className = "page";
 
@@ -63,36 +70,9 @@ function createPage(content){
             <p>${content}</p>
         </div>
     `;
+
     return page;
 }
 
-// ZOOM CONTROL SYSTEM
-let zoomed = false;
-
-bookElement.addEventListener("touchstart", ()=>{
-    zoomed = false;
-});
-
-bookElement.addEventListener("gesturestart", ()=>{
-    zoomed = true;
-    pageFlip.disableFlipByClick(true);
-});
-
-bookElement.addEventListener("gestureend", ()=>{
-    zoomed = false;
-    pageFlip.disableFlipByClick(false);
-});
-
-// DOUBLE TAP RESET
-let lastTap = 0;
-bookElement.addEventListener("touchend", function(event){
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTap;
-    if(tapLength < 300 && tapLength > 0){
-        location.reload();
-    }
-    lastTap = currentTime;
-});
-
-// LOAD EVERYTHING
+/* LOAD BOOK */
 loadChapters();
