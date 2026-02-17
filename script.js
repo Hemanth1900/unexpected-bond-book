@@ -1,78 +1,44 @@
-const bookElement = document.getElementById("book");
+const chaptersContainer = document.getElementById("chapters");
 
-/* INITIALIZE PAGEFLIP */
-const pageFlip = new St.PageFlip(bookElement, {
-    width:520,
-    height:680,
-    size:"stretch",
-    maxShadowOpacity:0.25,
-    showCover:true,
-    mobileScrollSupport:true,
-    swipeDistance:30,
-    autoSize:true,
-    clickEventForward:true,
-    useMouseEvents:true
-});
-
-/* LOAD CHAPTER FILES */
 async function loadChapters(){
 
-    const chapterFiles = [
-        "chapter1.txt",
-        "chapter2.txt"
-    ];
-
-    let allPages = [];
+    const res = await fetch("chapters.json");
+    const chapterFiles = await res.json();
 
     for(let file of chapterFiles){
 
-        const res = await fetch(file);
-        const text = await res.text();
+        const chapterRes = await fetch(file);
+        const text = await chapterRes.text();
 
-        const pages = splitIntoPages(text);
-
-        pages.forEach(page=>{
-            allPages.push(createPage(page));
-        });
+        renderChapter(text);
     }
-
-    /* LOAD ALL PAGES AT ONCE */
-    pageFlip.loadFromHTML(allPages);
 }
 
-/* SPLIT TEXT INTO BOOK PAGES */
-function splitIntoPages(text){
+function renderChapter(text){
 
-    const words = text.split(" ");
-    let pages = [];
-    let current = "";
+    const lines = text.split("\n");
 
-    words.forEach(word=>{
-        current += word + " ";
-        if(current.length > 1200){
-            pages.push(current);
-            current = "";
+    const chapterNumber = lines[0];
+    const chapterTitle = lines[1];
+    const paragraphs = lines.slice(2);
+
+    const page = document.createElement("section");
+    page.className = "page";
+
+    const content = document.createElement("div");
+    content.className = "page-content";
+
+    content.innerHTML += `<div class="chapter-number">${chapterNumber}</div>`;
+    content.innerHTML += `<div class="chapter-title">${chapterTitle}</div>`;
+
+    paragraphs.forEach(p=>{
+        if(p.trim() !== ""){
+            content.innerHTML += `<p>${p}</p>`;
         }
     });
 
-    pages.push(current);
-    return pages;
+    page.appendChild(content);
+    chaptersContainer.appendChild(page);
 }
 
-/* CREATE PAGE HTML */
-function createPage(content){
-
-    const page = document.createElement("div");
-    page.className = "page";
-
-    page.innerHTML = `
-        <div class="page-content">
-            <p>${content}</p>
-        </div>
-    `;
-
-    return page;
-}
-
-/* LOAD BOOK */
 loadChapters();
