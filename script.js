@@ -2,16 +2,8 @@ const bookElement = document.getElementById("book");
 
 async function loadChapters() {
 
-    // COVER PAGE
-    const cover = document.createElement("div");
-    cover.className = "page cover";
-    cover.innerHTML = `
-        <h1>The Journey From Unexpected Bond to Unexpected Goodbye</h1>
-        <h2>Ayush A.</h2>
-    `;
-    bookElement.appendChild(cover);
-
     let chapterNumber = 1;
+    let pageCount = 1;
 
     while(true){
         try{
@@ -23,14 +15,28 @@ async function loadChapters() {
             const page = document.createElement("div");
             page.className = "page";
 
-            page.innerHTML = text
+            const lines = text.split("\n");
+
+            let html = "";
+
+            html += `<div class="chapter-number">${lines[0]}</div>`;
+            html += `<div class="chapter-title">${lines[1]}</div>`;
+
+            const content = lines.slice(2).join("\n\n");
+
+            html += content
                 .split("\n\n")
                 .map(p => `<p>${p}</p>`)
                 .join("");
 
+            html += `<div class="${pageCount % 2 === 0 ? 'page-number-right':'page-number-left'}">${pageCount}</div>`;
+
+            page.innerHTML = html;
+
             bookElement.appendChild(page);
 
             chapterNumber++;
+            pageCount++;
 
         }catch{
             break;
@@ -41,13 +47,16 @@ async function loadChapters() {
 }
 
 function initBook(){
+
     const pageFlip = new St.PageFlip(
         bookElement,
         {
-            width: 450,
-            height: 600,
-            showCover: true,
-            mobileScrollSupport: true
+            width: 500,
+            height: 650,
+            size: "stretch",
+            showCover: false,
+            mobileScrollSupport: true,
+            useMouseEvents: true
         }
     );
 
@@ -55,7 +64,7 @@ function initBook(){
 
     window.saveBookmark = function(){
         localStorage.setItem("bookmark", pageFlip.getCurrentPageIndex());
-        alert("Bookmarked!");
+        alert("Page bookmarked!");
     }
 
     const savedPage = localStorage.getItem("bookmark");
