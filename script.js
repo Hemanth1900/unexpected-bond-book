@@ -1,166 +1,98 @@
 const bookElement = document.getElementById("book");
 
-/* ============================= */
-/* ADD REAL BOOK OPENING PAGES   */
-/* ============================= */
+// PAGEFLIP INITIALIZATION (FAST + SMOOTH)
+const pageFlip = new St.PageFlip(bookElement, {
+    width:550,
+    height:700,
+    size:"stretch",
+    maxShadowOpacity:0.25,
+    showCover:true,
+    mobileScrollSupport:true,
+    swipeDistance:25,
+    autoSize:true,
+    clickEventForward:true,
+    useMouseEvents:true
+});
 
-function addCover(){
-
-    /* LEFT INSIDE BLANK */
-    const insideBlank = document.createElement("div");
-    insideBlank.className = "page";
-    insideBlank.innerHTML = `<div class="page-content"></div>`;
-    bookElement.appendChild(insideBlank);
-
-    /* RIGHT PAGE = COVER */
-    const cover = document.createElement("div");
-    cover.className = "page cover";
-
-    cover.innerHTML = `
-        <div class="cover-content">
-            <div class="cover-title">Unexpected Bond,<br>Unexpected Goodbye</div>
-            <div class="cover-author">Ayush A.</div>
-        </div>
-    `;
-    bookElement.appendChild(cover);
-
-    /* BLANK PAGE AFTER COVER */
-    const blankAfter = document.createElement("div");
-    blankAfter.className = "page";
-    blankAfter.innerHTML = `<div class="page-content"></div>`;
-    bookElement.appendChild(blankAfter);
-}
-
-/* ============================= */
-/* LOAD CHAPTER FILES            */
-/* ============================= */
-
+// LOAD CHAPTER FILES
 async function loadChapters(){
 
-    addCover();
+    const chapters = [
+        "chapter1.txt",
+        "chapter2.txt"
+    ];
 
-    let chapterNumber = 1;
-    let pageCount = 1;
+    for(let file of chapters){
 
-    while(true){
-        try{
-            const res = await fetch(`chapter${chapterNumber}.txt`);
-            if(!res.ok) break;
+        const res = await fetch(file);
+        const text = await res.text();
 
-            const text = await res.text();
-            const lines = text.split("\n");
+        const pages = splitIntoPages(text);
 
-            const chapterNum = lines[0];
-            const chapterTitle = lines[1];
-
-            const content = lines.slice(2).join("\n\n");
-
-            const words = content.split(" ");
-            let pageText = "";
-            let counter = 0;
-            let firstPage = true;
-
-            for(let word of words){
-                pageText += word + " ";
-                counter++;
-
-                if(counter >= 120){
-                    createPage(pageText, chapterNum, chapterTitle, pageCount, firstPage);
-                    pageText = "";
-                    counter = 0;
-                    pageCount++;
-                    firstPage = false;
-                }
-            }
-
-            if(pageText.trim() !== ""){
-                createPage(pageText, chapterNum, chapterTitle, pageCount, firstPage);
-                pageCount++;
-            }
-
-            chapterNumber++;
-
-        }catch{
-            break;
-        }
+        pages.forEach(page=>{
+            pageFlip.loadFromHTML(createPage(page));
+        });
     }
-
-    initBook();
 }
 
-/* ============================= */
-/* CREATE BOOK PAGES             */
-/* ============================= */
+// SPLIT TEXT INTO PAGE BLOCKS
+function splitIntoPages(text){
+    const words = text.split(" ");
+    const pages = [];
+    let current = "";
 
-function createPage(text, chapterNum, chapterTitle, pageNumber, firstPage){
+    words.forEach(word=>{
+        current += word + " ";
+        if(current.length > 1200){
+            pages.push(current);
+            current = "";
+        }
+    });
 
+    pages.push(current);
+    return pages;
+}
+
+// CREATE PAGE HTML
+function createPage(content){
     const page = document.createElement("div");
     page.className = "page";
 
-    let html = `<div class="page-content">`;
-
-    /* FIRST PAGE OF CHAPTER */
-    if(firstPage){
-        html += `<div class="chapter-number">${chapterNum}</div>`;
-        html += `<div class="chapter-title">${chapterTitle}</div>`;
-    }
-    else{
-        /* RUNNING HEADERS */
-        if(pageNumber % 2 === 0){
-            html += `<div class="header-right">${chapterTitle}</div>`;
-        } else {
-            html += `<div class="header-left">Ayush A.</div>`;
-        }
-    }
-
-    html += `<p>${text}</p>`;
-    html += `</div>`;
-
-    /* PAGE NUMBERS */
-    html += `<div class="${pageNumber % 2 === 0 ? 'page-number-right' : 'page-number-left'}">${pageNumber}</div>`;
-
-    page.innerHTML = html;
-    bookElement.appendChild(page);
+    page.innerHTML = `
+        <div class="page-content">
+            <p>${content}</p>
+        </div>
+    `;
+    return page;
 }
 
-/* ============================= */
-/* PAGE FLIP ENGINE (OPTIMIZED)  */
-/* ============================= */
+// ZOOM CONTROL SYSTEM
+let zoomed = false;
 
-function initBook(){
+bookElement.addEventListener("touchstart", ()=>{
+    zoomed = false;
+});
 
-    const pageFlip = new St.PageFlip(bookElement,{
-        width:500,
-        height:660,
-        size:"fixed",
-        showCover:true,
+bookElement.addEventListener("gesturestart", ()=>{
+    zoomed = true;
+    pageFlip.disableFlipByClick(true);
+});
 
-        /* PERFORMANCE OPTIMIZATION */
-        useMouseEvents:true,
-        mobileScrollSupport:false,
-        usePortrait:false,
-        autoSize:false,
-        maxShadowOpacity:0.3,
-        showPageCorners:false,
-        flippingTime:600
-    });
+bookElement.addEventListener("gestureend", ()=>{
+    zoomed = false;
+    pageFlip.disableFlipByClick(false);
+});
 
-    pageFlip.loadFromHTML(document.querySelectorAll(".page"));
-
-    /* BOOKMARK SYSTEM */
-    window.saveBookmark = function(){
-        localStorage.setItem("bookmark", pageFlip.getCurrentPageIndex());
-        alert("Page bookmarked!");
-    };
-
-    const saved = localStorage.getItem("bookmark");
-    if(saved){
-        pageFlip.flip(saved);
+// DOUBLE TAP RESET
+let lastTap = 0;
+bookElement.addEventListener("touchend", function(event){
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if(tapLength < 300 && tapLength > 0){
+        location.reload();
     }
-}
+    lastTap = currentTime;
+});
 
-/* ============================= */
-/* START BOOK                    */
-/* ============================= */
-
+// LOAD EVERYTHING
 loadChapters();
